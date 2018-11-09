@@ -2,49 +2,55 @@
 #include<queue>
 using namespace std;
 
-const int maxn=50;
+const int maxn=31;
 struct Node{
 	int data;
-	Node* left;
-	Node* right;
-}; 
+	Node* left,*right;
+};
+int post[maxn];
+int in[maxn];
 
-int pre[maxn],in[maxn],post[maxn];
-int n;
-
-Node * create(int postL,int postR,int inL,int inR){
+Node* create(int postL,int postR,int inL,int inR){
 	if(postL>postR){
 		return NULL;
 	}
 	Node* root=new Node;
 	root->data=post[postR];
 	int k;
-	for(k=inL;k<=inR;k++){
+	for(k=inL;k<inR;k++){
 		if(in[k]==post[postR]){
 			break;
 		}
 	}
-	int numLeft=k-inL;
-	root->left=create(postL,postL+numLeft-1,inL,k-1);
-	root->right=create(postL+numLeft,postR-1,k+1,inR);
+	int leftNum=k-inL;
+	root->left=create(postL,postL+leftNum-1,inL,k-1);
+	root->right=create(postL+leftNum,postR-1,k+1,inR);
 	
 	return root;
 }
-int num=0;
-void BFS(Node* root){
+void levelTraversal(Node* root){
 	queue<Node*> q;
 	q.push(root);
+	int flag=false;
 	while(!q.empty()){
-		Node* now=q.front();
+		Node* front=q.front();
 		q.pop();
-		printf("%d",now->data);
-		num++;
-		if(num<n) printf(" ");
-		if(now->left!=NULL) q.push(now->left);
-		if(now->right!=NULL) q.push(now->right);
+		if(flag==false){
+			flag=true;
+		}else{
+			printf(" ");
+		}
+		printf("%d",front->data);
+		if(front->left){
+			q.push(front->left);
+		}
+		if(front->right){
+			q.push(front->right);
+		}
 	}
 }
 int main(){
+	int n;
 	scanf("%d",&n);
 	for(int i=0;i<n;i++){
 		scanf("%d",&post[i]);
@@ -53,7 +59,8 @@ int main(){
 		scanf("%d",&in[i]);
 	}
 	Node* root=create(0,n-1,0,n-1);
-	BFS(root);
+	
+	levelTraversal(root);
 	
 	return 0;
 }

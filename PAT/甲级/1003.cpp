@@ -2,41 +2,46 @@
 #include<algorithm>
 using namespace std;
 
-const int MAXV=510;
-const int INF=10000000;
-
-int n,m,c1,c2;
-int d[MAXV],G[MAXV][MAXV];
+const int MAXV=1010;
+const int INF=0x3fffffff;
+int G[MAXV][MAXV];
+int d[MAXV];
 bool vis[MAXV]={false};
-int person[MAXV];
-int num[MAXV]={0},w[MAXV]={0};
+int weight[MAXV];
+int w[MAXV];
+int num[MAXV];
+int n,m,C1,C2;
 
-void Dijkstra(){
+void Dijkstra(int s){
 	fill(d,d+MAXV,INF);
-	d[c1]=0,w[c1]=person[c1],num[c1]=1;
+	d[s]=0;
+	w[s]=weight[s];
+	num[s]=1;
 	for(int i=0;i<n;i++){
 		int u=-1,MIN=INF;
 		for(int j=0;j<n;j++){
 			if(vis[j]==false&&d[j]<MIN){
-				MIN=d[j];
 				u=j;
+				MIN=d[j];
 			}
 		}
 		if(u==-1){
 			return;
 		}
+//		printf("%d ",u);
 		vis[u]=true;
 		for(int v=0;v<n;v++){
-			if(vis[v]==false&&G[u][v]!=INF){
+			if(vis[v]==false&&G[u][v]<INF){
 				if(d[u]+G[u][v]<d[v]){
 					d[v]=d[u]+G[u][v];
-					w[v]=w[u]+person[v];
-					num[v]=num[u];
+					w[v]=w[u]+weight[v];
+					num[v]=num[u];	
 				}else if(d[u]+G[u][v]==d[v]){
-					if(w[u]+person[v]>w[v]){
-						w[v]=w[u]+person[v];
+					d[v]=d[u]+G[u][v];
+					num[v]=num[u]+1;
+					if(w[v]<w[u]+weight[v]){
+						w[v]=w[u]+weight[v];
 					}
-					num[v]+=num[u];
 				}
 				
 			}
@@ -44,20 +49,20 @@ void Dijkstra(){
 	}
 }
 int main(){
-	
-	scanf("%d%d%d%d",&n,&m,&c1,&c2);
+	scanf("%d%d%d%d",&n,&m,&C1,&C2);
 	for(int i=0;i<n;i++){
-		scanf("%d",&person[i]);
+		scanf("%d",&weight[i]);
 	}
 	fill(G[0],G[0]+MAXV*MAXV,INF);
-	int s,e,d;
 	for(int i=0;i<m;i++){
-		scanf("%d%d%d",&s,&e,&d);
-		G[s][e]=G[e][s]=d;
+		int a,b,w;
+		scanf("%d%d%d",&a,&b,&w);
+		G[a][b]=G[b][a]=w;
 	}
-	Dijkstra();
 	
-	printf("%d %d\n",num[c2],w[c2]);
+	Dijkstra(C1);
+	
+	printf("%d %d\n",num[C2],w[C2]);
 	
 	return 0;
 }
