@@ -1,30 +1,21 @@
 #include<cstdio>
-#include<cstring>
-#include<algorithm>
-using namespace std;
 
-
-int main()
-{
-
-	int n,m;
-	scanf("%d %d",&n,&m);
-	int a[n];
-	
+int main(){
+	int a=0,b;
+	int tot=0;
+	int n;
+	scanf("%d",&n);
 	for(int i=0;i<n;i++){
-		scanf("%d",&a[i]);
-	}	
-	m=m%n;
-	int cnt=0;
-	for(int i=n-m;i<n;i++){		
-		printf("%d",a[i]);
-		cnt++;
-		if(cnt<n) printf(" ");
+		scanf("%d",&b);
+		if(b>a){
+			tot+=(b-a)*6;
+		}else{
+			tot+=(a-b)*4;
+		}
+		a=b;
+		tot+=5;
 	}
-	for(int i=0;i<n-m;i++){
-		printf("%d",a[i]);
-		cnt++;
-		if(cnt<n) printf(" ");
-	}
+	printf("%d\n",tot);
+	
 	return 0;
- } 
+}
