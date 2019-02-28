@@ -1,43 +1,33 @@
 #include<cstdio>
+#include<iostream>
+using namespace std;
 
-const int MAXN=1010;
-double pol1[MAXN],pol2[MAXN],ans[MAXN];
-
+const int maxn=1010;
+double poly[maxn];
 int main(){
-	int a,b,maxExp=0;
-	scanf("%d",&a);
-	for(int i=0;i<a;i++){
-		int exp;
-		scanf(" %d",&exp);
-		scanf(" %lf",&pol1[exp]);
-		
-		if(exp>maxExp){
-			maxExp=exp;
+	int k,line=2;
+	int maxCoe=-1;
+	while(line--){
+		cin>>k;
+		for(int i=0;i<k;i++){
+			int coe;
+			double exp;
+			cin>>coe>>exp;
+			if(coe>maxCoe) maxCoe=coe;
+			poly[coe]+=exp;
 		}
-	}
-	scanf("%d",&b);
-	for(int i=0;i<b;i++){
-		int exp;
-		scanf(" %d",&exp);
-		scanf(" %lf",&pol2[exp]);
-		if(exp>maxExp){
-			maxExp=exp;	
-		}
-		
 	}
 	int cnt=0;
-	for(int i=0;i<=maxExp;i++){
-		ans[i]=pol1[i]+pol2[i];
-		if(ans[i]!=0){
-			//printf("i:%d,%.1lf ",i,ans[i]);
+	for(int i=maxCoe;i>=0;i--){
+		if(poly[i]){
 			cnt++;
 		}
 	}
-	printf("%d",cnt);
-	for(int i=maxExp;i>=0;i--){
-		if(ans[i]!=0){
-			printf(" %d %.1lf",i,ans[i]);
+	cout<<cnt;
+	for(int i=maxCoe;i>=0;i--){
+		if(poly[i]){
+			printf(" %d %.1lf",i,poly[i]);
 		}
 	}
 	return 0;
-} 
+}

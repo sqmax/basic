@@ -1,31 +1,55 @@
-#include<cstdio>
-#include<cmath>
+#include<algorithm>
+#include<iostream>
 #include<vector>
+#include<set>
 using namespace std;
 
+bool cmp(vector<int> a,vector<int> b){
+	if(a[0]!=b[0]) return a[0]<b[0];
+	else return a[1]<b[1];
+}
 int main(){
 	int n;
-	scanf("%d",&n);
-	vector<int> assert(n+1);
+	cin>>n;
+	int w[n];
 	for(int i=1;i<=n;i++){
-		scanf("%d",&assert[i]);
-	}
-	for(int i=1;i<=n;i++){//不断地假设两个狼人i，j 
-		for(int j=i+1;j<=n;j++){
-			vector<int> liar,actual(n+1,1);
-			actual[i]=actual[j]=-1;//狼人用-1表示，好人1 
+		cin>>w[i];
+	}	
+	vector<vector<int> > ans;
+	
+	for(int i=1;i<=n;i++){
+		for(int j=i+1;j<=n;j++){//假设i,j为骗子 
+			w[i]=-w[i];
+			w[j]=-w[j];
+			vector<int> liar;
+			liar.push_back(i);
+			liar.push_back(j);
+			set<int> tmpWF;
 			for(int k=1;k<=n;k++){
-				if(assert[k]*actual[abs(assert[k])]<0){//k说的话与实际不符，则k为骗子 
-					liar.push_back(k);
+				if(w[k]<0) tmpWF.insert(-w[k]);
+			}
+			vector<int> wf;
+			if(tmpWF.size()==2){
+				for(auto i:tmpWF){
+					wf.push_back(i);
 				}
 			}
-			if(liar.size()==2&&actual[liar[0]]+actual[liar[1]]==0){
-				printf("%d %d\n",i,j);
-				return 0;
+			cout<<wf.size()<<endl;
+			if(wf.size()==2){
+				if(liar!=wf){
+					if(liar[0]==wf[0]||liar[0]==wf[1]||liar[1]==wf[0]||liar[1]==wf[1]){
+						printf("liar:%d %d\n",liar[0],liar[1]);
+						ans.push_back(wf);	
+					}
+				}	
 			}
+			w[i]=-w[i];
+			w[j]=-w[j];	
 		}
 	}
-	printf("No Solution\n");
+	sort(ans.begin(),ans.end(),cmp);
+	for(int i=0;i<ans.size();i++){
+		cout<<ans[i][0]<<" "<<ans[i][1]<<"\n"; 	
+	}
 	
-	return 0;
 } 

@@ -1,54 +1,53 @@
 #include<cstdio>
+#include<iostream>
 #include<vector>
 #include<queue>
+#include<map>
+#include<algorithm>
 using namespace std;
 
 const int maxn=110;
 struct Node{
-	int key;
-	int layer;
 	vector<int> childs;
-}node[maxn]; 
-int ans[maxn];
-int maxL=0;
+	int level;
+}node[maxn];
+int levelLeafN[maxn];
+int maxL=-1;
 
-void orderTrave(int root){
+void levelOrder(int root){
 	queue<int> q;
-	node[root].layer=0;
 	q.push(root);
+	node[root].level=0;
 	while(!q.empty()){
-		int front=q.front();
+		int top=q.front();
 		q.pop();
-		if(node[front].childs.size()==0){
-			ans[node[front].layer]++;			
+		int level=node[top].level;
+		maxL=(maxL,level);
+		if(node[top].childs.size()==0){
+			levelLeafN[level]++;
 		}
-		if(node[front].layer>maxL){
-			maxL=node[front].layer;
-		}
-		for(int i=0;i<node[front].childs.size();i++){
-			int child=node[front].childs[i];
-			node[child].layer=node[front].layer+1;
-			q.push(child);
+		for(int i=0;i<node[top].childs.size();i++){
+			int ch=node[top].childs[i];
+			q.push(node[top].childs[i]);
+			node[ch].level=level+1;					
 		}
 	}
 }
 int main(){
 	int n,m;
-	scanf("%d%d",&n,&m);
+	cin>>n>>m;
 	for(int i=0;i<m;i++){
-		int id,k,child;
-		scanf("%d%d",&id,&k);
+		int id,k,ch;
+		cin>>id>>k;
 		for(int j=0;j<k;j++){
-			scanf("%d",&child);
-			node[id].childs.push_back(child);
+			cin>>ch;
+			node[id].childs.push_back(ch);
 		}
 	}
-	orderTrave(1);
+	levelOrder(1);
 	for(int i=0;i<=maxL;i++){
-		printf("%d",ans[i]);
-		if(i<maxL){
-			printf(" ");
-		}
+		printf("%d",levelLeafN[i]);
+		if(i<maxL) printf(" ");
 	}
 	return 0;
 }

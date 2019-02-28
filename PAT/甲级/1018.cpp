@@ -9,7 +9,7 @@ const int INF=1000000;
 int G[maxn][maxn];
 int d[maxn];
 vector<int> pre[maxn];
-int bike[maxn];
+int W[maxn];
 bool vis[maxn];
 int C,N,S,M;
 
@@ -40,23 +40,33 @@ void Dijkstra(){
 	}	
 } 
 vector<int> temp,ans;
-int minNeed=INF;
+int minNeed=INF,minRemain=INF;
 void DFS(int des){
+	temp.push_back(des);
 	if(des==0){
-		temp.push_back(des);
-		int totBike=0;
-		for(int i=0;i<temp.size();i++){
-			totBike+=bike[temp[i]];
+		int need=0,remain=0;
+		for(int i=temp.size()-1;i>=0;i--){
+			int id=temp[i];
+			if(W[id]>0){
+				remain+=W[id];
+			}else{
+				if(remain>abs(W[id])){
+					remain-=abs(W[id]);
+				}else{
+					need+=abs(W[id])-remain;
+					remain=0;
+				}
+			}
 		}
-		int need=(temp.size()-1)*C/2;
-		if(abs(need-totBike)<minNeed){
-			minNeed=need-totBike;
+		if(need<minNeed){
+			minNeed=need;
+			minRemain=remain;
+			ans=temp;
+		}else if(need==minNeed&&remain<minRemain){
+			minRemain=remain;
 			ans=temp;
 		}
-		temp.pop_back();
-		return;
 	}
-	temp.push_back(des);
 	for(int i=0;i<pre[des].size();i++){
 		DFS(pre[des][i]);
 	}
@@ -66,7 +76,9 @@ int main(){
 	scanf("%d%d%d%d",&C,&N,&S,&M);
 	fill(G[0],G[0]+maxn*maxn,INF);
 	for(int i=1;i<=N;i++){
-		scanf("%d",&bike[i]);
+		int x;
+		scanf("%d",&x);
+		W[i]=x-C/2;
 	}
 	for(int i=0;i<M;i++){
 		int a,b,t;
@@ -77,14 +89,12 @@ int main(){
 	
 	DFS(S);
 	
-	if(minNeed<0) printf("0 ");
-	else printf("%d ",minNeed);
-	for(int i=ans.size()-1;i>0;i--){
-		printf("%d->",ans[i]);
+	printf("%d ",minNeed);
+	for(int i=ans.size()-1;i>=0;i--){
+		printf("%d",ans[i]);
+		if(i>0) printf("->");
 	}
-	printf("%d ",S);
+	printf(" %d",minRemain);
 	
-	if(minNeed<0) printf("%d\n",-minNeed);
-	else printf("0\n");
 	return 0;
 }

@@ -1,81 +1,64 @@
-//最后一个测试点错误，求助 
-#include<cstdio>
 #include<iostream>
 #include<string>
-#include<map>
+#include<unordered_map>
 #include<algorithm>
+#include<vector> 
 using namespace std;
 
-const int maxn=100010;
-struct School{
+struct Institu{
 	string code;
-	int total,num;
-	School(){
-		total=num=0;
-	}
-}schools[maxn]; 
-map<string,int> schToInt;
-int numSchool;
-int change(string sch){
-	if(schToInt.find(sch)!=schToInt.end()){
-		return schToInt[sch];
-	}else{
-		schToInt[sch]=numSchool;
-		return numSchool++;
-	}
-}
-bool cmp(School a,School b){
-	if(a.total!=b.total){
-		return a.total>b.total;
-	}else if(a.num!=b.num){
-		return a.num<b.num;
-	}else{
-		return a.code<b.code;
-	}
-}
-string toLowerCase(string s){
-	int len=s.length();
-	for(int i=0;i<len;i++){
-		if(s[i]<='Z'){
-			s[i]+='a'-'A';
+	int tws,person;
+}; 
+unordered_map<string,Institu> mp;
+string toLower(string id){
+	for(int i=0;i<id.length();i++){
+		if(id[i]>='A'&&id[i]<='Z'){
+			id[i]+=32;
 		}
 	}
-	return s;
+	return id;
 }
-int transferScore(char level,int score){
-	switch(level){
-		case 'T':score*=1.5;break;
-		case 'B':score=1.0*score/1.5;break;
-	}
-	return (int)score;
+bool cmp(Institu a,Institu b){
+	if(a.tws!=b.tws) return a.tws>b.tws;
+	else if(a.person!=b.person) return a.person<b.person;
+	else return a.code<b.code;
 }
 int main(){
 	int n;
-	scanf("%d",&n);
+	unordered_map<string,double> sumSco;
+	unordered_map<string,int> numPer;
+	cin>>n;
 	for(int i=0;i<n;i++){
-		string id,school;
-		int score;
-		cin>>id>>score>>school;
-		school=toLowerCase(school);
-//		cout<<id<<" "<<score<<" "<<school<<endl;
-		int s=change(school);
-		score=transferScore(id[0],score);
-		schools[s].code=school;
-		schools[s].total+=score;
-		schools[s].num++;
-	}	
-	sort(schools,schools+numSchool,cmp);
-	printf("%d\n",numSchool);
-	int rank=1;
-	for(int i=0;i<numSchool;i++){
-		if(i>0&&schools[i].total==schools[i-1].total){
-			printf("%d ",rank);
-		}else{
-			printf("%d ",i+1);
-			rank=i+1;
-		}
-		cout<<schools[i].code<<" "<<schools[i].total<<" "<<schools[i].num<<endl;
+		string id,insti;
+		double s;
+		cin>>id>>s>>insti;
+		insti=toLower(insti);
+		
+		if(id[0]=='B') s=s/1.5;
+		else if(id[0]=='T') s=s*1.5;
+//		cout<<insti<<" "<<s<<endl;
+		sumSco[insti]+=s;
+		numPer[insti]++; 
+
 	}
-	
+	vector<Institu> ans;
+	for( auto it=numPer.begin();it!=numPer.end();it++){
+		ans.push_back(Institu{it->first,(int)sumSco[it->first],numPer[it->first]});
+	}
+	sort(ans.begin(),ans.end(),cmp);
+	printf("%d\n",ans.size());
+	int rank=1;
+	for(int i=0;i<ans.size();i++){
+		if(i==0){
+			cout<<rank;
+		}else if(ans[i].tws==ans[i-1].tws){
+			cout<<rank;
+		}else{
+			rank=i+1;
+			cout<<rank;
+		}
+		cout<<" "<<ans[i].code<<" "<<ans[i].tws<<" "<<ans[i].person<<"\n";
+	}
 	return 0;
 }
+

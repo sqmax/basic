@@ -1,154 +1,150 @@
 #include<cstdio>
+#include<iostream>
 #include<vector>
 #include<algorithm>
-#include<string>
 using namespace std;
 
-const int maxn=1010;
-const int INF=1000000;
-
-int G[maxn][maxn]={0};
-int length[maxn][maxn];
-int time[maxn][maxn];
-int d[maxn],t[maxn];
+const int maxn=510;
+const int INF=0x3fffffff;
+int G[maxn][maxn];
+int T[maxn][maxn],D[maxn][maxn];
+int t[maxn],d[maxn];
 bool vis[maxn];
-int pre[maxn];
-int S,D;
+vector<int> pre1[maxn],pre2[maxn];
 int n,m;
-
-void DijkstraForDis(int s){
+int st,ed;
+void DijkstraOnDis(int s){
 	fill(d,d+maxn,INF);
-	fill(t,t+maxn,INF);
 	d[s]=0;
-	t[s]=0;
 	for(int i=0;i<n;i++){
-		int u=-1,MIN=INF;
+		int u=-1,Min=INF;
 		for(int j=0;j<n;j++){
-			if(vis[j]==false&&d[j]<MIN){
+			if(vis[j]==false&&d[j]<Min){
 				u=j;
-				MIN=d[j];
-			}
+				Min=d[j];
+			} 
 		}
-		if(u==-1){
-			return;
-		}
+		if(u==-1) return;
 		vis[u]=true;
-//		printf("%d\n",u);
+//		printf("%d\n",u); 
 		for(int v=0;v<n;v++){
-			if(vis[v]==false&&G[u][v]==1){
-				if(d[u]+length[u][v]<d[v]){
-					d[v]=d[u]+length[u][v];
-					pre[v]=u;
-//					pre[v].clear();
-//					pre[v].push_back(u);
-				}
-				else if(d[u]+length[u][v]==d[v]){
-					if(t[u]+time[u][v]<t[v]){
-						t[v]=t[u]+time[u][v];
-						pre[v]=u;
-					}
+			if(vis[v]==false&&D[u][v]!=INF){
+				if(d[u]+D[u][v]<d[v]){
+					d[v]=d[u]+D[u][v];
+					pre1[v].clear();
+					pre1[v].push_back(u);
+				}else if(d[u]+D[u][v]==d[v]){
+					pre1[v].push_back(u);
 				}
 			}
 		}
 	}
 }
-vector<int> pre2[maxn];
-void DijkstraForTime(int s){
+int shortest=INF;
+vector<int> path,ans1;
+void DFSOnDis(int e){
+	path.push_back(e);
+	if(e==st){
+		int totTime=0;
+		for(int i=path.size()-1;i>0;i--){
+			totTime+=T[path[i]][path[i-1]];
+		}
+		if(totTime<shortest){
+			shortest=totTime;
+			ans1=path;
+		}
+		path.pop_back();
+		return;
+	}
+	for(int i=0;i<pre1[e].size();i++){
+		int pre=pre1[e][i];
+		DFSOnDis(pre);
+	}
+	path.pop_back();
+}
+void DijkstraOnTime(int s){
 	fill(t,t+maxn,INF);
+	fill(vis,vis+maxn,false);
 	t[s]=0;
 	for(int i=0;i<n;i++){
-		int u=-1,MIN=INF;
+		int u=-1,Min=INF;
 		for(int j=0;j<n;j++){
-			if(vis[j]==false&&t[j]<MIN){
+			if(vis[j]==false&&t[j]<Min){
 				u=j;
-				MIN=t[j];
-			}
+				Min=t[j];
+			} 
 		}
-		if(u==-1){
-			return;
-		}
+		if(u==-1) return;
 		vis[u]=true;
-//		printf("%d\n",u);
+//		printf("%d\n",u); 
 		for(int v=0;v<n;v++){
-			if(vis[v]==false&&G[u][v]==1){
-				if(t[u]+time[u][v]<t[v]){
-					t[v]=t[u]+time[u][v];
+			if(vis[v]==false&&T[u][v]!=INF){
+				if(t[u]+T[u][v]<t[v]){
+					t[v]=t[u]+T[u][v];
 					pre2[v].clear();
 					pre2[v].push_back(u);
-				}
-				else if(t[u]+time[u][v]==t[v]){
+				}else if(t[u]+T[u][v]==t[v]){
 					pre2[v].push_back(u);
 				}
 			}
 		}
 	}
 }
-vector<int> path1;
-void DFS1(int d){
-	if(d==S){
-		path1.push_back(d);
-		return;
-	}
-	DFS1(pre[d]);
-	path1.push_back(d);
-//	printf(" -> %d",d);
-}
-vector<int> path2,tmp;
-int minInter=INF; 
-void DFS2(int d){
-	if(d==S){
-		tmp.push_back(d);
-		if(tmp.size()<minInter){
-			minInter=tmp.size();
-			path2=tmp;
+int fewest=INF;
+vector<int> ans2;
+void DFSOnTime(int e){
+	path.push_back(e);
+	if(e==st){
+		if(path.size()<fewest){
+			fewest=path.size();
+			ans2=path;
 		}
-		tmp.pop_back();
-		
+		path.pop_back();
 		return;
 	}
-	tmp.push_back(d);
-	for(int i=0;i<pre2[d].size();i++){
-		DFS2(pre2[d][i]);
+	for(int i=0;i<pre2[e].size();i++){
+		int pre=pre2[e][i];
+		DFSOnTime(pre);
 	}
-	tmp.pop_back();
+	path.pop_back();
 }
-
 int main(){
-
-	scanf("%d%d",&n,&m);
+	cin>>n>>m;
+	fill(T[0],T[0]+maxn*maxn,INF);
+	fill(D[0],D[0]+maxn*maxn,INF);
 	for(int i=0;i<m;i++){
-		int v1,v2,ow,l,t;
-		scanf("%d%d%d%d%d",&v1,&v2,&ow,&l,&t);
-		G[v1][v2]=1;
+		int a,b,ow,len,time;
+		cin>>a>>b>>ow>>len>>time;
+		T[a][b]=time;
+		D[a][b]=len;
 		if(ow==0){
-			G[v2][v1]=1;
+			T[b][a]=time;
+			D[b][a]=len;
 		}
-		length[v1][v2]=length[v2][v1]=l;
-		time[v1][v2]=time[v2][v1]=t;
-	}
-	scanf("%d%d",&S,&D);
-	DijkstraForDis(S);
-	DFS1(D);
+	}	
+	cin>>st>>ed;
+	DijkstraOnDis(st);	
+	DFSOnDis(ed);
 	
-	fill(vis,vis+maxn,false);
-	DijkstraForTime(S);
-	DFS2(D);
-	reverse(path2.begin(),path2.end());
-	if(path1==path2){
-		printf("Distance = %d; Time = %d: %d",d[D],t[D],S);
-		for(int i=1;i<path1.size();i++){
-			printf(" -> %d",path1[i]);
+	DijkstraOnTime(st);
+	DFSOnTime(ed);
+	
+	if(ans1==ans2){
+		printf("Distance = %d; Time = %d: %d",d[ed],t[ed],st);
+		for(int i=ans1.size()-2;i>=0;i--){
+			printf(" -> %d",ans1[i]);
 		}
 	}else{
-		printf("Distance = %d: %d",d[D],S);
-		for(int i=1;i<path1.size();i++){
-			printf(" -> %d",path1[i]);
+		printf("Distance = %d: %d",d[ed],st);
+		for(int i=ans1.size()-2;i>=0;i--){
+			printf(" -> %d",ans1[i]);
 		}
 		printf("\n");
-		printf("Time = %d: %d",t[D],S);
-		for(int i=1;i<path2.size();i++){
-			printf(" -> %d",path2[i]);
+		printf("Time = %d: %d",t[ed],st);
+		for(int i=ans2.size()-2;i>=0;i--){
+			printf(" -> %d",ans2[i]);
 		}
-		printf("\n");
-	}	
-} 
+	}
+	
+	return 0;
+}

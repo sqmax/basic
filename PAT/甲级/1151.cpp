@@ -1,10 +1,10 @@
+#include<iostream>
 #include<cstdio>
-#include<vector>
+#include<map>
 using namespace std;
 
-const int maxn=100010;
-int in[maxn],pre[maxn];
-int pos[maxn]; 
+int* pre,*in;
+map<int,int> pos;
 
 void LCA(int preRoot,int inL,int inR,int u,int v){
 	if(inL>inR) return;
@@ -25,31 +25,30 @@ void LCA(int preRoot,int inL,int inR,int u,int v){
 		}
 	}
 }
-
 int main(){
-	int M,N;
-	scanf("%d%d",&M,&N);
-	for(int i=1;i<=N;i++){
+	int m,n;
+	scanf("%d%d",&m,&n);
+	in=new int[n+1];
+	pre=new int[n+1];
+	for(int i=1;i<=n;i++){
 		scanf("%d",&in[i]);
 		pos[in[i]]=i;
-	}	
-	for(int i=1;i<=N;i++){
+	}
+	for(int i=1;i<=n;i++){
 		scanf("%d",&pre[i]);
 	}
-	
-	while(M--){
+	while(m--){
 		int a,b;
 		scanf("%d%d",&a,&b);
-		if(pos[a]&&pos[b]){
-			LCA(1,1,N,a,b);
-		}else if(pos[a]){
-			printf("ERROR: %d is not found.\n",b);
-		}else if(pos[b]){
+		if(pos[a]==0&&pos[b]==0){
+			printf("ERROR: %d and %d are not found.\n",a,b);
+		}else if(pos[a]==0){
 			printf("ERROR: %d is not found.\n",a);
+		}else if(pos[b]==0){
+			printf("ERROR: %d is not found.\n",b);
 		}else{
-			printf("ERROR: %d and %d are not found.\n",a,b);	
+			LCA(1,1,n,a,b);
 		}
 	}
-	
 	return 0;
 }

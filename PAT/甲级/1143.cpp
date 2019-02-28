@@ -1,90 +1,55 @@
-#include<cstdio>
+//该方法测试点4超时，正确的见1143-2
+//但是1143-2只使用与二叉搜索树，该方法适合于所有的二叉树 
+#include<iostream>
 #include<algorithm>
-#include <set>
+#include<map>
 using namespace std;
 
-struct Node{
-	int data;
-	Node* left,*right;
-};
-void insert(Node* &root,int a){
-	if(root==NULL){
-		root=new Node;
-		root->data=a;
-		root->left=root->right=NULL;
-		return;
-	}
-	if(a<root->data){
-		insert(root->left,a);
-	}else{
-		insert(root->right,a);
-	}
-}
+const int maxn=10010;
+int pre[maxn],in[maxn];
+map<int,int> pos;
 
-bool search(Node* root,int a){
-	if(root==NULL){
-		return false;
-	}
-	if(a<root->data){
-		search(root->left,a);
-	}else if(a>root->data){
-		search(root->right,a);
+void LCA(int preRoot,int inL,int inR,int u,int v){
+	if(inL>inR) return;
+	int uInIdx=pos[u],vInIdx=pos[v];
+	int inRoot=pos[pre[preRoot]];
+	if(uInIdx<inRoot&&vInIdx<inRoot){
+		LCA(preRoot+1,inL,inRoot-1,u,v);
+	}else if(uInIdx<inRoot&&vInIdx>inRoot||(uInIdx>inRoot&&vInIdx<inRoot)){
+		printf("LCA of %d and %d is %d.\n",u,v,pre[preRoot]);
+	}else if(uInIdx>inRoot&&vInIdx>inRoot){
+		LCA(preRoot+(inRoot-inL)+1,inRoot+1,inR,u,v);
 	}else{
-		return true;
-	}
-}
-void LCA(Node* root,int a,int b,bool changed){
-	if(root!=NULL){
-		if(a<root->data&&b>root->data){
-			if(changed){
-				printf("LCA of %d and %d is %d.\n",b,a,root->data);	
-			}else{
-				printf("LCA of %d and %d is %d.\n",a,b,root->data);
-			}
-		}else if(a==root->data){
-			printf("%d is an ancestor of %d.\n",a,b);
-			
-		}else if(b==root->data){
-			printf("%d is an ancestor of %d.\n",b,a);
-		}else if(a>root->data){
-			LCA(root->right,a,b,changed);
-		}else{
-			LCA(root->left,a,b,changed);
+		if(uInIdx=inRoot){
+			printf("%d is an ancestor of %d.\n",u,v);
+		}else if(vInIdx==inRoot){
+			printf("%d is an ancestor of %d.\n",v,u);
 		}
 	}
 }
 int main(){
 	int m,n;
-	scanf("%d%d",&m,&n);
-	Node* root=NULL;
-	set<int> s;
-	for(int i=0;i<n;i++){
-		int a;
-		scanf("%d",&a);
-		insert(root,a);
-		s.insert(a);
+	cin>>m>>n;
+	for(int i=1;i<=n;i++){
+		cin>>pre[i];
+		in[i]=pre[i];	
 	}
-	for(int i=0;i<m;i++){
+	sort(in+1,in+n+1);
+	for(int i=1;i<=n;i++){
+		pos[in[i]]=i;
+	}
+	while(m--){
 		int a,b;
-		scanf("%d%d",&a,&b);
-//		bool flag1=search(root,a);
-//		bool flag2=search(root,b);
-		bool flag1=s.find(a)!=s.end();
-		bool flag2=s.find(b)!=s.end();
-		if(!flag1&&!flag2){
+		cin>>a>>b;
+		if(pos[a]==0&&pos[b]==0){
 			printf("ERROR: %d and %d are not found.\n",a,b);
-		}else if(!flag1){
+		}else if(pos[a]==0){
 			printf("ERROR: %d is not found.\n",a);
-		}else if(!flag2){
+		}else if(pos[b]==0){
 			printf("ERROR: %d is not found.\n",b);
 		}else{
-			bool changed=false;
-			if(a>b){
-				swap(a,b);
-				changed=true;
-			}
-			LCA(root,a,b,changed); 
-		}		
+			LCA(1,1,n,a,b);
+		}
 	}
 	return 0;
 }

@@ -1,53 +1,42 @@
 #include<cstdio>
+#include<iostream>
 #include<map>
 #include<set>
 using namespace std;
 
-const int maxn=100010;
-int Pair[maxn];
-map<int,set<int> > mp;
-
+map<int,set<int> > incom;
 int main(){
 	int n,m;
-	scanf("%d%d",&n,&m);
-	getchar();
+	cin>>n>>m;
 	while(n--){
 		int a,b;
-		scanf("%d%d",&a,&b);
-		mp[a].insert(b);
-		mp[b].insert(a);
+		cin>>a>>b;
+		incom[a].insert(b);
+		incom[b].insert(a);
 	}
-	set<int> ship; 
 	while(m--){
 		int k;
-		scanf("%d",&k);
+		set<int> st;
+		cin>>k;
+		int a;
 		for(int i=0;i<k;i++){
-			int a;
-			scanf("%d",&a);
-			ship.insert(a);
+			cin>>a;
+			st.insert(a);
 		}
 		bool flg=true;
-		for(set<int>::iterator it=ship.begin();it!=ship.end();it++){
-			
-			if(mp.find(*it)!=mp.end()){
-				set<int> st=mp[*it];
-				for(set<int>::iterator it2=st.begin();it2!=st.end();it2++){
-					if(ship.find(*it2)!=ship.end()){
-						flg=false;
-						break;
-					}
+		for(auto i:st){
+			set<int> tmp=incom[i];
+			for(auto j:tmp){
+				if(st.find(j)!=st.end()){
+					flg=false;
+					break;
 				}
 			}
 			if(flg==false) break;
-//			printf("a:%d %d\n",*it,Pair[*it]);
-//			if(ship.find(Pair[*it])!=ship.end()){
-//				flg=false;
-//				printf("%d\n",*it);
-//				break;
-//			}
 		}
-		if(flg) printf("Yes\n");
-		else printf("No\n");
-		ship.clear();
+		if(flg) cout<<"Yes\n";
+		else cout<<"No\n";
 	}
+	
+	return 0;
 } 

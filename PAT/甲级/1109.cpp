@@ -1,71 +1,51 @@
-//3¸ö²âÊÔµã´íÎó£¬ÇóÖú 
 #include<cstdio>
-#include<string>
 #include<iostream>
-#include<cstring>
+#include<string>
 #include<algorithm>
+#include<vector>
 using namespace std;
 
 const int maxn=10010;
-struct Person{
+struct People{
 	string name;
 	int height;
-}person[maxn];
-
-bool cmp(Person a,Person b){
-	if(a.height!=b.height){
-		return a.height>b.height;
-	}else{
-		a.name<b.name;
-	}
+}stu[maxn];
+bool cmp(People a,People b){
+	if(a.height!=b.height) return a.height>b.height;
+	else return a.name<b.name;
 }
 int main(){
 	int n,k;
 	cin>>n>>k;
+	string name;
+	int h;
 	for(int i=0;i<n;i++){
-		cin>>person[i].name>>person[i].height;
+		cin>>stu[i].name>>stu[i].height;
 	}
-	sort(person,person+n,cmp);
-//	printf("------------\n");
+	sort(stu,stu+n,cmp);
 //	for(int i=0;i<n;i++){
-//		cout<<person[i].name<<" "<<i<<endl;
+//		cout<<stu[i].name<<" "<<stu[i].height<<endl;
 //	}
-//	printf("------------\n");
-	int lastRowNum;
-	if(n>k){
-		lastRowNum=n%k+k;
-	}else{
-		lastRowNum=n;
-	}
-	int row=n/k;
-	string line="";
+//	cout<<"-----\n";
+	int m;
+	vector<int> line;
 	int cnt=0;
-	for(int i=0;i<lastRowNum;i++){
-		if(i%2){
-			line.insert(0," ");
-			line.insert(0,person[i].name);
-		}else{
-			if(i) line.append(" ");
-			line.insert(line.length(),person[i].name);
-		}
-		cnt++;
-	}
-	cout<<line<<endl;
-	row--;
-	while(row>0){
-		line="";
-		for(int i=0;i<k;i++){
-			if(i%2){
-				line.insert(0," ");
-				line.insert(0,person[cnt].name);
+	for(int i=0;i<k;i++){
+		if(i==0) m=n/k+n%k;
+		else m=n/k;
+		for(int j=0;j<m;j++){
+			if(j%2==0){
+				line.push_back(cnt++);
 			}else{
-				if(i) line.append(" ");
-				line.insert(line.length(),person[cnt].name);
+				line.insert(line.begin(),cnt++);
 			}
-			cnt++;
 		}
-		cout<<line<<endl;
-		row--;
-	}
+		for(int j=0;j<m;j++){
+			cout<<stu[line[j]].name;
+			if(j<m-1) cout<<" ";
+			else cout<<"\n";
+		}
+		line.clear();
+	}	
 	return 0;
-}
+} 
